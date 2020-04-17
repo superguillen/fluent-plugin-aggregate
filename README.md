@@ -1,4 +1,5 @@
 # fluent-plugin-aggregate , a plugin for [Fluentd](http://fluentd.org)
+[![Build Status](https://api.travis-ci.org/superguillen/fluent-plugin-aggregate.svg?branch=master)](https://api.travis-ci.org/superguillen/fluent-plugin-aggregate)
 
 A fluentd plugin to aggregate events by fields over time.
 
