@@ -84,6 +84,7 @@ module Fluent
                           field_no_data_value: @field_no_data_value,
                           processing_mode: :online,
                           log: log,
+                          aggregator_name: @aggregator_name,
                           aggregation_names: @aggregation_names,
                           group_field_names: @group_field_names,
                           aggregate_field_names: @aggregate_field_names)
