@@ -65,12 +65,13 @@ Aggregate funtions to apply, this plugin support multiple aggregations fields.
 aggregations sum,min,max,mean,median,variance,standard_deviation
 ```
 ### aggregate_event_tag
-Tag prefix for events generated in the aggregation process. Full tag format is #{aggregate_event_tag}.#{interval} . Default: aggregate
+#### Default: aggregate
+Tag prefix for events generated in the aggregation process. Full tag format is #{aggregate_event_tag}.#{interval}.
 ```
 aggregate_event_tag aggregate
 ```
 ### Example
-Aggregate funtions to apply, this plugin support multiple aggregations fields.
+Example with dummy input.
 ```
 <system>
   workers 1
@@ -96,4 +97,47 @@ Aggregate funtions to apply, this plugin support multiple aggregations fields.
 <match aggregate.**>
   @type stdout
 </match>
+```
+### Advanced parameters
+### time_field
+#### Default: timestamp
+Field that conatins time for the event.
+```
+time_field timestamp
+```
+### time_format
+#### Default: %Y-%m-%dT%H:%M:%S.%L%:z
+Time format for the time_field.
+```
+time_format %Y-%m-%dT%H:%M:%S.%L%:z
+```
+### output_time_format
+#### Default: %Y-%m-%dT%H:%M:%S.%L%:z
+Time format for the generated aggregated event.
+```
+output_time_format %Y-%m-%dT%H:%M:%S.%L%:z
+```
+### field_no_data_value
+#### Default: no_data
+The value for group fields in the aggregate event no present in the original event.
+```
+field_no_data_value no_data
+```
+### emit_original_message
+#### Default: true
+The value for group fields in the aggregate event no present in the original event.
+```
+emit_original_message true
+```
+### temporary_status_file_path
+#### Default: nil
+File to store aggregate information when the agent down.
+```
+temporary_status_file_path path_to_file.json
+```
+### load_temporarystatus_file_enabled
+#### Default: true
+Load file #{temporary_status_file_path} on startup.
+```
+load_temporarystatus_file_enabled true
 ```
