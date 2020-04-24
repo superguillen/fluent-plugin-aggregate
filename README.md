@@ -64,3 +64,36 @@ Aggregate funtions to apply, this plugin support multiple aggregations fields.
 ```
 aggregations sum,min,max,mean,median,variance,standard_deviation
 ```
+### aggregate_event_tag
+Tag prefix for events generated in the aggregation process. Full tag format is #{aggregate_event_tag}.#{interval} . Default: aggregate
+```
+aggregate_event_tag aggregate
+```
+### Example
+Aggregate funtions to apply, this plugin support multiple aggregations fields.
+```
+<system>
+  workers 1
+</system>
+<source>
+  @type dummy
+  dummy {"tx":"test", "response_ms":500}
+  tag test
+  rate 1
+</source>
+<filter test>
+  @type aggregate
+  intervals 5s,10s
+  keep_interval 1s
+  group_fields tx
+  aggregate_fields response_ms
+  aggregator_suffix_name "aggregator#{worker_id}"
+  aggregate_event_tag aggregate
+</filter>
+<match test>
+  @type stdout
+</match>
+<match aggregate.**>
+  @type stdout
+</match>
+```
