@@ -22,9 +22,7 @@ unless ENV.has_key?('VERBOSE')
   $log = nulllogger
 end
 
-require 'fluentd/plugin/out_syslog'
-require 'fluentd/plugin/out_syslog_buffered'
-
+require 'fluent/plugin/filter_aggregate'
 
 class Test::Unit::TestCase
 end

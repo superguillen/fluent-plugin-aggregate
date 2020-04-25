@@ -19,6 +19,7 @@ module Fluent
     config_param :aggregations, :string, :default => 'sum,min,max,mean,median,variance,standard_deviation'
     config_param :temporary_status_file_path, :string, :default => nil, :desc => 'File to store aggregate information when the agent down'
     config_param :load_temporarystatus_file_enabled, :bool, :default => true, :desc => 'Enable load saved data from file (if exist status file)'
+    config_param :processing_mode, :string, :default => 'online', :desc => 'Processing mode (batch/online)'
 
     VALID_AGGREGATIONS = ['sum','min','max','mean','median','variance','standard_deviation']
 
@@ -74,6 +75,7 @@ module Fluent
 
       log.warn "temporary_status_file_path is empty, is recomended using to avoid lost statistic information beetween restarts." if @temporary_status_file_path.nil?
       @aggregator_mutex = Mutex.new
+      @processing_mode_type=@processing_mode=='batch' ? :batch : :online
       @data_operations = DataOperations::Aggregate.new(aggregator: @aggregator,
                           time_format: @time_format,
                           time_field: @time_field,
@@ -82,7 +84,7 @@ module Fluent
                           flush_interval: @flush_interval,
                           keep_interval: @keep_interval,
                           field_no_data_value: @field_no_data_value,
-                          processing_mode: :online,
+                          processing_mode: @processing_mode_type,
                           log: log,
                           aggregator_name: @aggregator_name,
                           aggregation_names: @aggregation_names,
