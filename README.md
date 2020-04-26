@@ -99,6 +99,12 @@ Example with dummy input.
 </match>
 ```
 ### Advanced parameters
+### processing_mode
+#### Default: online
+Mode for processing events (batch/online), for the online processing (useful for streaming processing), wait to arrive events (for example, interval of 5s, wait 5s + keep_interval to generate aggregate events), batch process don't wait.
+```
+processing_mode online
+```
 ### time_field
 #### Default: timestamp
 Field that conatins time for the event.
