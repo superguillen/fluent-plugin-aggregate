@@ -6,17 +6,20 @@ module Fluent
     config_param :output_time_format, :string, :default =>'%Y-%m-%dT%H:%M:%S.%L%z'
     config_param :intervals, :array, :default =>[5], value_type: :time,
 	         :desc => 'Interval for accumulative  aggregation'
+    config_param :interval, :array, :default =>nil, value_type: :time,
+	         :desc => 'Interval for accumulative  aggregation, legacy option',
+                 :deprecated => 'Use intervals instead'
     config_param :flush_interval, :time, :default =>5,
 	         :desc => 'Interval for emmit  aggregation events'
     config_param :keep_interval, :time, :default =>10,
 	         :desc => 'Interval to wait for events to aggregate'
-    config_param :group_fields, :string, :default =>'field1,field2'
-    config_param :aggregate_fields, :string, :default =>'aggregate_field1,aggregate_field2'
+    config_param :group_fields, :array, :default => ['field1','field2'], value_type: :string
+    config_param :aggregate_fields, :array, :default => ['aggregate_field1','aggregate_field2'], value_type: :string
     config_param :time_field, :string, :default =>'timestamp'
     config_param :field_no_data_value, :string, :default =>'no_data'
     config_param :emit_original_message, :bool, :default => true
     config_param :aggregate_event_tag, :string, :default => 'aggregate'
-    config_param :aggregations, :string, :default => 'sum,min,max,mean,median,variance,standard_deviation'
+    config_param :aggregations, :array, :default => ['sum','min','max','mean','median','variance','standard_deviation'], value_type: :string
     config_param :temporary_status_file_path, :string, :default => nil, :desc => 'File to store aggregate information when the agent down'
     config_param :load_temporarystatus_file_enabled, :bool, :default => true, :desc => 'Enable load saved data from file (if exist status file)'
     config_param :processing_mode, :string, :default => 'online', :desc => 'Processing mode (batch/online)'
@@ -32,6 +35,7 @@ module Fluent
 
       require 'dataoperations-aggregate'
 
+      @intervals = @interval unless @interval.nil?
       @hash_time_format = "%Y-%m-%dT%H"
       @interval_seconds = 3600
       @intervals[1..-1].each{|interval|
@@ -45,9 +49,9 @@ module Fluent
         end
       }
 
-      @group_field_names = @group_fields.split(",")
-      @aggregate_field_names = @aggregate_fields.split(",")
-      @aggregation_names = @aggregations.split(",")
+      @group_field_names = @group_fields
+      @aggregate_field_names = @aggregate_fields
+      @aggregation_names = @aggregations
       @aggregator_name = "#{Socket.gethostname}"
       @aggregator_name = "#{@aggregator_name}-#{@aggregator_suffix_name}" unless @aggregator_suffix_name.nil?
 
