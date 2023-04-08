@@ -20,12 +20,14 @@ module Fluent
     config_param :emit_original_message, :bool, :default => true
     config_param :aggregate_event_tag, :string, :default => 'aggregate'
     config_param :aggregations, :array, :default => ['sum','min','max','mean','median','variance','standard_deviation'], value_type: :string
+    config_param :buckets, :array, :default => [], value_type: :integer
+    config_param :bucket_metrics, :array, :default => [], value_type: :string
     config_param :temporary_status_file_path, :string, :default => nil, :desc => 'File to store aggregate information when the agent down'
     config_param :load_temporarystatus_file_enabled, :bool, :default => true, :desc => 'Enable load saved data from file (if exist status file)'
     config_param :processing_mode, :string, :default => 'online', :desc => 'Processing mode (batch/online)'
     config_param :time_started_mode, :string, :default => 'first_event', :desc => 'Time started mode (first_event/last_event)'
 
-    VALID_AGGREGATIONS = ['sum','min','max','mean','median','variance','standard_deviation']
+    VALID_AGGREGATIONS = ['sum','min','max','mean','median','variance','standard_deviation','bucket']
 
     def initialize
       super
@@ -62,6 +64,12 @@ module Fluent
         end
       }
 
+      if @aggregation_names.include?("bucket") && (buckets.empty? || bucket_metrics.empty?)
+        log.warn "bucket aggregation disabled, need buckets & bucket_metrics parameters to work, please review documentation."
+      else
+        log.info "bucket aggregation enabled, bucket count bucket_metrics with values <= buckets parameter"
+      end
+
       @aggregator = {}
       if load_temporarystatus_file_enabled && ! @temporary_status_file_path.nil? && File.exist?(@temporary_status_file_path) && file_status = File.open(@temporary_status_file_path,'r')
         begin
@@ -96,7 +104,10 @@ module Fluent
                           aggregator_name: @aggregator_name,
                           aggregation_names: @aggregation_names,
                           group_field_names: @group_field_names,
-                          aggregate_field_names: @aggregate_field_names)
+                          aggregate_field_names: @aggregate_field_names,
+                          buckets: @buckets,
+                          bucket_metrics: @bucket_metrics
+                         )
     end
 
     def filter(tag, time, record)
