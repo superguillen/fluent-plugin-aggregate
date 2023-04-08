@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.description = "Filter aggregtation plugin for Fluent"
   gem.homepage    = "https://github.com/superguillen/fluent-plugin-aggregate"
   gem.summary     = gem.description
-  gem.version     = "1.0.4"
+  gem.version     = "1.0.6"
   gem.authors     = ["superguillen"]
   gem.email       = "superguillen.public@gmail.com"
   gem.license     = 'MIT'
