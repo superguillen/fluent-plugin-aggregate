@@ -69,7 +69,7 @@ module Fluent
 
       if @aggregation_names.include?("histogram") && (histogram_buckets.empty? || histogram_fields.empty?)
         log.warn "histogram aggregation disabled, need histogram_buckets & histogram_fields parameters to work, please review documentation."
-      else
+      elsif @aggregation_names.include?("histogram") && !(histogram_buckets.empty? || histogram_fields.empty?)
         log.info "histogram aggregation enabled, bucket count histogram_fields with values (le|ge) histogram_buckets parameter"
       end
 
