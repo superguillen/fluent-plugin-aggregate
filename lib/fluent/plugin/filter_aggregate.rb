@@ -20,14 +20,17 @@ module Fluent
     config_param :emit_original_message, :bool, :default => true
     config_param :aggregate_event_tag, :string, :default => 'aggregate'
     config_param :aggregations, :array, :default => ['sum','min','max','mean','median','variance','standard_deviation'], value_type: :string
-    config_param :buckets, :array, :default => [], value_type: :integer
-    config_param :bucket_metrics, :array, :default => [], value_type: :string
+    config_param :histogram_buckets, :array, :default => [], value_type: :integer
+    config_param :histogram_fields, :array, :default => [], value_type: :string
+    config_param :histogram_cumulative, :bool, :default => false
+    config_param :histogram_bucket_infinite_enabled, :bool, :default => false
+    config_param :histogram_bucket_comparation, :string, :default => 'less_or_equal'
     config_param :temporary_status_file_path, :string, :default => nil, :desc => 'File to store aggregate information when the agent down'
     config_param :load_temporarystatus_file_enabled, :bool, :default => true, :desc => 'Enable load saved data from file (if exist status file)'
     config_param :processing_mode, :string, :default => 'online', :desc => 'Processing mode (batch/online)'
     config_param :time_started_mode, :string, :default => 'first_event', :desc => 'Time started mode (first_event/last_event)'
 
-    VALID_AGGREGATIONS = ['sum','min','max','mean','median','variance','standard_deviation','bucket']
+    VALID_AGGREGATIONS = ['sum','min','max','mean','median','variance','standard_deviation','histogram']
 
     def initialize
       super
@@ -60,14 +63,14 @@ module Fluent
 
       @aggregation_names.each {|operation|
         if ! VALID_AGGREGATIONS.include?(operation)
-          raise Fluent::ConfigError, "aggregations must set any combination of sum,min,max,mean,median,variance,standard_deviation "
+          raise Fluent::ConfigError, "aggregations must set any combination of sum,min,max,mean,median,variance,standard_deviation,histogram"
         end
       }
 
-      if @aggregation_names.include?("bucket") && (buckets.empty? || bucket_metrics.empty?)
-        log.warn "bucket aggregation disabled, need buckets & bucket_metrics parameters to work, please review documentation."
+      if @aggregation_names.include?("histogram") && (histogram_buckets.empty? || histogram_fields.empty?)
+        log.warn "histogram aggregation disabled, need histogram_buckets & histogram_fields parameters to work, please review documentation."
       else
-        log.info "bucket aggregation enabled, bucket count bucket_metrics with values <= buckets parameter"
+        log.info "histogram aggregation enabled, bucket count histogram_fields with values (le|ge) histogram_buckets parameter"
       end
 
       @aggregator = {}
@@ -90,6 +93,7 @@ module Fluent
       @aggregator_mutex = Mutex.new
       @processing_mode_type=@processing_mode=='batch' ? :batch : :online
       @time_started_mode_type=@time_started_mode=='first_event' ? :fist_event : :last_event
+      @histogram_bucket_comparation_mode=@histogram_bucket_comparation=='less_or_equal' ? :less_or_equal : :greater_or_equal
       @data_operations = DataOperations::Aggregate.new(aggregator: @aggregator,
                           time_format: @time_format,
                           time_field: @time_field,
@@ -105,8 +109,11 @@ module Fluent
                           aggregation_names: @aggregation_names,
                           group_field_names: @group_field_names,
                           aggregate_field_names: @aggregate_field_names,
-                          buckets: @buckets,
-                          bucket_metrics: @bucket_metrics
+                          histogram_buckets: @histogram_buckets,
+                          histogram_fields: @histogram_fields,
+                          histogram_cumulative: @histogram_cumulative,
+                          histogram_bucket_infinite_enabled: @histogram_bucket_infinite_enabled,
+                          histogram_bucket_comparation: @histogram_bucket_comparation_mod
                          )
     end
 
