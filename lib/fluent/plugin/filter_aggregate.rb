@@ -113,7 +113,7 @@ module Fluent
                           histogram_fields: @histogram_fields,
                           histogram_cumulative: @histogram_cumulative,
                           histogram_bucket_infinite_enabled: @histogram_bucket_infinite_enabled,
-                          histogram_bucket_comparation: @histogram_bucket_comparation_mod
+                          histogram_bucket_comparation: @histogram_bucket_comparation_mode
                          )
     end
 
